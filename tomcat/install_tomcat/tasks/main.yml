@@ -1,0 +1,63 @@
+---
+- name: "create tomcat user "
+  user: 
+    name: "{{TOMCAT_USER}}"
+    comment: tomcat runner
+    shell: /bin/bash
+    home: /home/{{TOMCAT_USER}}
+
+- name: "copy jdk files"
+  copy:
+    src: "{{item}}"
+    dest: /tmp/
+  loop:
+    - "{{JDK_FILE}}"
+
+- name: "create tomcat dir"
+  file:
+    path: /home/{{TOMCAT_USER}}/tomcat_src
+    state: directory
+
+- name: "create maven dir"
+  file:
+    path: "{{MAVEN_PATH}}"
+    state: directory
+
+- name: "copy tomcat files"
+  unarchive:
+    src: "{{item}}"
+    dest: /home/{{TOMCAT_USER}}/tomcat_src
+  loop:
+    - "{{TOMCAT_FILE}}"
+
+- name: "copy maven files"
+  unarchive:
+    src: "{{item}}"
+    dest: "{{MAVEN_PATH}}"
+  loop:
+    - "{{MAVEN_FILE}}"
+
+- name: "judge java file"
+  shell: rpm -qa | grep jdk
+  register: java_exsit_result
+  ignore_errors: True 
+- name: "install jdk"
+  yum: 
+    name: /tmp/{{JDK_FILE}}
+    state: present
+  when: java_exsit_result is failed
+
+- name: "judge maven file"
+  shell: alternatives --list|grep mvn
+  register: maven_exsit_result
+  ignore_errors: True
+- name: "install maven"
+  shell: alternatives --install /usr/bin/mvn mvn {{MAVEN_PATH}}/bin/mvn 1 && echo "1"| alternatives --config mvn
+  when: maven_exsit_result is failed
+
+- name: chown owner
+  file: 
+    path: /home/{{TOMCAT_USER}}
+    owner: "{{TOMCAT_USER}}"
+    group: "{{TOMCAT_USER}}"
+    recurse: yes

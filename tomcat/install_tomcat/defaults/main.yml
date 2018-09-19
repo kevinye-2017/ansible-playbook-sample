@@ -1,0 +1,8 @@
+---
+TOMCAT_USER: "osyenv"
+TOMCAT_FILE: "tomcat-8.0.52.tar.gz"
+MAVEN_FILE: "maven-3.3.9-bin.tar.gz"
+TOMCAT_DIR: "tomcat-8.0.52"
+MAVEN_DIR: "maven-3.3.9"
+MAVEN_PATH: "/usr/local/maven"
+JDK_FILE: "jdk-1.8.0_171.rpm"
