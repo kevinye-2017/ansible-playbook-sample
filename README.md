@@ -1,6 +1,20 @@
 ```
 +-----------+
-some example ansible playbook roles
-include tomcat,redis-replication etc...
+requirement
+ansible 2.4.3+,python2.7,centos7+
 +-----------+
+
+```
+
+```
++-----------+
+some example ansible playbook roles
+include tomcat,redis-replication,zabbix-agent etc...
++-----------+
+```
+excute example
+```
+create hosts files (define server/ip)
+ansible-playbook -i hosts -e "target=zabbix" deploy_zabbix_agentd.yml
+ansible-playbook -i hosts -e "target=tomcat" install_tomcat.yml
 ```
