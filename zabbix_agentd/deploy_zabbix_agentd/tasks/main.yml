@@ -1,0 +1,31 @@
+--- 
+- name: "set facts"
+  set_fact:
+    hostname: "{{ansible_nodename}}"
+- name: "install zabbix repos"
+  shell: rpm -i {{zabbix_repos}}
+  ignore_errors: True
+
+- name: "judge software install"
+  shell: systemctl list-unit-files|grep zabbix-agent
+  register: result
+  ignore_errors: True    
+- name: "install zabbix agentd"
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ zabbix_packets }}"
+  when: result is failed
+
+- name: "copy zabbix_agentd.conf to client"
+  template:
+    src: zabbix_agentd.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+  notify:
+    - restart zabbix_agent  
+
+- name: "enable zabbix_agentd service"
+  systemd:
+    name: zabbix-agent
+    enabled: yes
+    masked: no

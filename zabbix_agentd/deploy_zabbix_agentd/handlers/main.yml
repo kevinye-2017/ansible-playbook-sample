@@ -1,0 +1,4 @@
+- name: "restart zabbix_agent"
+  systemd:
+    state: restarted
+    name: "{{zabbix_packets}}"
