@@ -57,4 +57,4 @@
     - { src: sentinel-server.service, dest: /etc/systemd/system/multi-user.target.wants/ }
   notify:
     - restart redis
-#    - restart sentinel
+    - restart sentinel
