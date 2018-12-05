@@ -8,9 +8,11 @@ use sentinel for auto switch master role
 
 ```
 
-
+```
 atleast 2 ip for redis-relication!!!
 the first ip is used as the default redis-master
+use systemd to manage redis-server and sentinel-server
+```
 
 excute example
 ```
