@@ -10,6 +10,8 @@ ansible 2.4.3+,python2.7,centos7+
 +-----------+
 some best practice example for ansible playbook roles
 include tomcat,redis-replication,zabbix-agent etc...
+
+all roles are configurable (in ansible roles default directory)
 +-----------+
 ```
 excute example
