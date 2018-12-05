@@ -1,0 +1,13 @@
+---
+# restart services
+- name: restart redis
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: redis-server
+
+- name: restart sentinel
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: sentinel-server

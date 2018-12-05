@@ -1,0 +1,21 @@
+[Unit]
+Description=Redis Sentinel
+After=network.target
+
+[Service]
+LimitNOFILE=65536
+User={{ REDIS_USER }}
+Group={{ REDIS_USER }}
+Environment=statedir=/var/run/sentinel
+PermissionsStartOnly=true
+PIDFile=/var/run/sentinel/redis-sentinel.pid
+ExecStartPre=/bin/mkdir -p ${statedir}
+ExecStartPre=/bin/chown -R {{ REDIS_USER }}:{{ REDIS_USER }} ${statedir}
+ExecStart={{ EXECUTE_DIR }}/bin/redis-sentinel /etc/redis/sentinel.conf --daemonize no
+ExecStop={{ EXECUTE_DIR }}/bin/redis-cli -p {{ SENTINEL_PORT }} shutdown
+ExecReload=/bin/kill -USR2 $MAINPID
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
