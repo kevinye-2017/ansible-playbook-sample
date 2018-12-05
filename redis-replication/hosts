@@ -1,0 +1,5 @@
+[rediscluster]
+cluster_ip001
+cluster_ip002
+cluster_ip003
+
