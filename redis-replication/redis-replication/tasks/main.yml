@@ -53,8 +53,8 @@
   loop:
     - { src: redis.conf, dest: /etc/redis/ }
     - { src: sentinel.conf, dest: /etc/redis/ }
-    - { src: redis-server.service, dest: /etc/systemd/system/multi-user.target.wants/ }
-    - { src: sentinel-server.service, dest: /etc/systemd/system/multi-user.target.wants/ }
+    - { src: redis-server.service, dest: /usr/lib/systemd/system/ }
+    - { src: sentinel-server.service, dest: /usr/lib/systemd/system/ }
   notify:
     - restart redis
     - restart sentinel
