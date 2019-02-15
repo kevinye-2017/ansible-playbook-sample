@@ -1,0 +1,58 @@
+---
+- name: Check install result
+  shell: rpm -qa|grep rabbitmq-server
+  args:
+    warn: false
+  register: get_rabbit
+  ignore_errors: yes
+- name: Install rabbitmq server
+  block:
+    - shell: |
+        curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | sudo bash
+        curl -s https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh | sudo bash
+      args:
+        warn: false
+    - yum:
+        name: rabbitmq-server
+        state: latest
+  when: get_rabbit.stdout_lines == ''
+
+- name: Add node to hosts file
+  template: 
+    src: hosts.j2
+    dest: /etc/hosts
+
+- name: Set erlang.cookie
+  block:
+    - shell: echo {{ ERLANG_COOKIE }} >/var/lib/rabbitmq/.erlang.cookie
+    - systemd:
+         name: rabbitmq-server
+         state: restarted
+         enabled: yes
+
+- name: Setup rabbitmq managerment plugin
+  block:
+    - shell: rabbitmq-plugins enable rabbitmq_management
+      args:
+        warn: false
+    - systemd:
+        name: rabbitmq-server
+        state: restarted
+
+- name: Setup rabbitmq cluster node
+  shell: |
+    rabbitmqctl stop_app
+    rabbitmqctl join_cluster rabbit@{{ HOSTNAME }}
+    rabbitmqctl start_app
+  when: inventory_hostname != HOSTNAME 
+
+- name: Add managerment user
+  shell: |
+    [[ ! -n `rabbitmqctl list_users | grep {{ RABBITMQ_USER }} | awk '{print $1}'` ]] || rabbitmqctl add_user {{ RABBITMQ_USER }} {{ RABBITMQ_PASSWD }}
+    [[ ! -n `rabbitmqctl list_users | grep {{ RABBITMQ_USER }} | awk '{print $1}'` ]] || rabbitmqctl set_user_tags {{ RABBITMQ_USER }} administrator
+    [[ ! -n `rabbitmqctl list_users | grep {{ RABBITMQ_USER }} | awk '{print $1}'` ]] || rabbitmqctl set_permissions -p / {{ RABBITMQ_USER }} ".*" ".*" ".*"
+    [[ ! -n `rabbitmqctl list_users | grep guest | awk '{print $1}'` ]] || rabbitmqctl delete_user guest
+  when: inventory_hostname == HOSTNAME
+
+- name: Setup queue mirroring
+  shell: rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'

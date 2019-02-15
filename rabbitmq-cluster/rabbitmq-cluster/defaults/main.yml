@@ -1,0 +1,12 @@
+### erlang.cookie 
+ERLANG_COOKIE: "{{ erlang_cookie | default('BPGFBADRFTFQURHEYQRU') }}"
+
+###pick hostname use to replication 
+###assume you have multi node, hostname: worker001 worker002 ...
+HOSTNAME: "{{ hostname | default('worker001') }}"
+
+### rabbitmq managerment user and  password 
+RABBITMQ_USER: "{{ rabbitmq_user | default('managerment') }}"
+RABBITMQ_PASSWD: "{{ rabbitmq_passwd | default('adminxxx') }}"
+
+

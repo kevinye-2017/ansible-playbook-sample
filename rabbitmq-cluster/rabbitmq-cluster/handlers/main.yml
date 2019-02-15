@@ -1,0 +1,11 @@
+---
+- name: restart rabbitmq-cluster 1
+  systemd:
+    name: rabbitmq-server
+    state: restarted
+    enabled: yes
+- name: restart rabbitmq-cluster 2
+  systemd:
+    name: rabbitmq-server
+    state: restarted
+  when: inventory_hostname == HOSTNAME
