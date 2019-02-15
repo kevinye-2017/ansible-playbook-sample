@@ -1,0 +1,7 @@
+# sample inventory hosts
+[worker]
+worker001 ansible_host=192.168.1.52
+worker002 ansible_host=192.168.1.53
+worker003 ansible_host=192.168.1.54
+worker004 ansible_host=192.168.1.55
+worker005 ansible_host=192.168.1.56
