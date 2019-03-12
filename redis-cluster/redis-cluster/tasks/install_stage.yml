@@ -1,0 +1,67 @@
+---
+- name: install centos 7 dependencies
+  block:
+   - yum: name=gcc,make,automake,cmake,tar,gzip,unzip
+  when: "ansible_os_family == 'RedHat'"
+
+- name: unarchive redis to remote server
+  unarchive:
+    src: redis-{{ REDIS_VERSION }}.tar.gz
+    dest: /tmp/
+
+- name: install redis with source code
+  make:
+    chdir: /tmp/redis-{{ REDIS_VERSION }}
+    target: install
+    params: 
+      PREFIX: "{{ EXECUTE_DIR }}"
+
+- name: create redis user
+  user: name={{ REDIS_USER }}
+
+- name: create install directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    group: "{{ REDIS_USER }}"
+    owner: "{{ REDIS_USER }}"
+    mode: 0755
+  loop:
+    - "{{ DATA_DIR }}"
+    - "{{ CONF_DIR }}"
+    - "{{ REDIS_LOG }}"
+
+- name: enable firewalld
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  loop:
+    - 6379
+    - 16379
+  
+- name: generate redis configure files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ REDIS_USER }}"
+    group: "{{ REDIS_USER }}"
+    mode: 0755
+  loop:
+    - { src: redis.conf, dest: /etc/redis/ }
+    - { src: redis-server.service, dest: /usr/lib/systemd/system/ }
+  notify:
+    - restart redis
+
+- block:
+    - name: copy template
+      template:
+        src: set_cluster.cml
+        dest: /tmp/set_cluster.cml
+    - name: set cluster status
+      shell: cat /tmp/set_cluster.cml |xargs
+      register: cmSetCluster
+      ignore_errors: true
+#    - name: run set cluster command
+#      shell: yes | {{ cmSetCluster.stdout_lines.0 }}
+  when: inventory_hostname == ansible_play_hosts[0]
