@@ -1,0 +1,12 @@
+---
+#redis configure
+EXECUTE_DIR: "/usr/local/redis"
+REDIS_PORT: "{{ port | default('6379') }}"
+REDIS_PID: "/var/run/redis.pid"
+REDIS_LOG: "/var/log/redis"
+CONF_DIR: "/etc/redis"
+DATA_DIR: "{{ data_dir | default('/var/lib/redis') }}"
+REDIS_PASS: "{{ passwd | default('redis321') }}"
+REDIS_VERSION: "{{ version | default('5.0.2') }}"
+REDIS_USER: "redis"
+
