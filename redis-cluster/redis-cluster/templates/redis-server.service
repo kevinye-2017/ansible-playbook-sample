@@ -1,0 +1,21 @@
+[Unit]
+Description=Redis In-Memory Data Store
+After=network.target
+
+[Service]
+Type=forking
+User={{ REDIS_USER }}
+Group={{ REDIS_USER }}
+LimitNOFILE=65536
+Environment=NOTIFY_SOCKET=""
+ExecStartPre=/usr/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled
+ExecStartPre=/usr/bin/echo 4096 > /proc/sys/net/ipv4/tcp_max_syn_backlog
+ExecStartPre=/usr/bin/echo 4096 > /proc/sys/net/core/somaxconn
+ExecStart={{ EXECUTE_DIR }}/bin/redis-server {{ CONF_DIR }}/redis.conf
+ExecStop={{ EXECUTE_DIR }}/bin/redis-cli shutdown
+ExecReload=/bin/kill -USR2 $MAINPID
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
