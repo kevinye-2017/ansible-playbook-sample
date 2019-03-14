@@ -71,4 +71,8 @@
       shell: "echo yes | {{ item }}"
       loop:
         - "{{ cmSetCluster.stdout_lines[0] }}" 
+    - name: delete password/set_cluster.cml file
+      file:
+        name: /tmp/set_cluster.cml
+        state: absent
   when: inventory_hostname == ansible_play_hosts[0]
