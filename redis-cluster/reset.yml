@@ -1,0 +1,18 @@
+---
+- hosts: redis
+  remote_user: root
+  gather_facts: true
+  tasks:
+    - name: stop redis cluster
+      systemd: 
+        name: redis-server
+        enabled: no
+        state: stopped
+    - name: delete fliles
+      file:
+        name: "{{item}}"
+        state: absent
+      loop: 
+        - /tmp/set_cluster.cml
+        - /usr/local/redis
+        - /var/lib/redis
