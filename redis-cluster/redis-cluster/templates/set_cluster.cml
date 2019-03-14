@@ -3,4 +3,4 @@
 {# server_ip.append(hostvars[host]['ansible_default_ipv4']['address']+ ":6379") #}
 {{ server_ip.append(hostvars[host]['inventory_hostname'] + ":" + REDIS_PORT) }}
 {% endfor %}
-{{EXECUTE_DIR }}/bin/redis-cli --cluster create {{ server_ip|sort|join(' ') }} --cluster-replicas 1
+{{EXECUTE_DIR }}/bin/redis-cli --cluster create {{ server_ip|sort|join(' ') }} --cluster-replicas 1 -a {{ REDIS_PASS }}
