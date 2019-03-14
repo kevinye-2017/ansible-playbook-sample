@@ -53,6 +53,11 @@
   notify:
     - restart redis
 
+- name: restart redis-server
+  systemd: 
+    name: redis-server
+    state: restarted
+
 - block:
     - name: copy template
       template:
@@ -62,6 +67,8 @@
       shell: cat /tmp/set_cluster.cml |xargs
       register: cmSetCluster
       ignore_errors: true
-#    - name: run set cluster command
-#      shell: yes | {{ cmSetCluster.stdout_lines.0 }}
+    - name: run set cluster command
+      shell: "echo yes | {{ item }}"
+      loop:
+        - "{{ cmSetCluster.stdout_lines[0] }}" 
   when: inventory_hostname == ansible_play_hosts[0]
