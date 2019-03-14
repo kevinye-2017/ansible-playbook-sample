@@ -16,3 +16,4 @@
         - /tmp/set_cluster.cml
         - /usr/local/redis
         - /var/lib/redis
+        - /etc/redis
